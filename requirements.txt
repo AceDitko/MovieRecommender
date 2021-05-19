@@ -1,0 +1,17 @@
+ipykernel
+numpy
+#pandas==0.24.2
+pandas
+pandas-profiling
+pydantic
+requests
+datetime
+gspread
+pathlib
+matplotlib
+oauth2client
+fsspec
+spacy
+sklearn
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz
+#python -m spacy download en_core_web_sm
