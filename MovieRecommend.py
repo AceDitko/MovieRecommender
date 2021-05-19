@@ -67,7 +67,28 @@ class Movies:
 
     def train_model(self):
 
+        self.clean_data()
         self.create_features()
+
+    def clean_data(self):
+
+        in_df = self.input_df
+
+        in_df['BoxOffice'] = in_df['BoxOffice'].str.replace(',','')
+        in_df['BoxOffice'] = in_df['BoxOffice'].str.replace('$','')
+        in_df['BoxOffice'] = in_df['BoxOffice'].replace('N/A',np.NaN)
+        in_df['BoxOffice'] = in_df['BoxOffice'].apply(lambda x: float(x))
+
+        in_df['Released'] = pd.to_datetime(in_df['Released'], errors='coerce')
+        in_df['Released'] = in_df['Released'].dt.strftime("%d/%m/%y")
+
+        in_df['Runtime'] = in_df['Runtime'].str.replace(' min','')
+        in_df['Runtime'] = in_df['Runtime'].replace('N/A', np.NaN)
+        in_df['Runtime'] = in_df['Runtime'].apply(lambda x: float(x))
+
+        in_df['True Rating'] = in_df['True Rating'].apply(lambda x: int(x))
+
+        self.input_df = in_df
 
     def create_features(self):
 
