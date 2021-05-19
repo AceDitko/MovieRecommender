@@ -6,6 +6,7 @@ import datetime
 import gspread
 import spacy
 import re
+from tqdm import tqdm
 from io import StringIO
 #import functions
 from pathlib import Path
@@ -145,7 +146,7 @@ class Movies:
 
         year_diff = current_year - int(start_year)
 
-        for i in range (0, year_diff+1):
+        for i in range(0, year_diff+1):
             year = int(start_year) + i
             self.pull_from_sheet(str(year))
 
@@ -219,11 +220,14 @@ class Movies:
 
         out_list = []
 
-        for key in search_df['search_key'].to_list():
+        pbar = tqdm(search_df['search_key'].to_list())
+
+        for key in pbar:
             key_url = url + key
             r = requests.get(key_url)
             json_data = r.json()
-            print("importing " + json_data['Title'] + "...")
+            #pbar.set_description("importing " + json_data['Title'] + "...")
+            pbar.set_description("Importing " + year)
             out_list.append(json_data)
 
         json_object = json.dumps(out_list)
