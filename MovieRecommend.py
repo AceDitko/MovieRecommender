@@ -146,11 +146,17 @@ class Movies:
 
         year_diff = current_year - int(start_year)
 
-        for i in range(0, year_diff+1):
-            year = int(start_year) + i
-            self.pull_from_sheet(str(year))
+        if Path('movie_db.json').is_file():
+            print('Loading saved movie database...')
+            self.input_df = pd.read_json('movie_db.json')
+        else:
+            for i in range(0, year_diff+1):
+                year = int(start_year) + i
+                self.pull_from_sheet(str(year))
+            
+            self.merge_sheets()
 
-        self.merge_sheets()
+            self.input_df.to_json('movie_db.json')
 
     def merge_sheets(self):
         '''
