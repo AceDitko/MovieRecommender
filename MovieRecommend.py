@@ -117,19 +117,8 @@ class Movies:
 
         for df in join_dfs:
             in_df = in_df.merge(df, left_index=True, right_index=True)
-            #in_df = pd.concat([in_df, df], axis=1, keys=[in_df.index])
-            #in_df = pd.concat([in_df, df])
 
         print("Dataframes joined")
-
-        #in_df['Bag of Words'] = (in_df['Plot Lemma'] + 
-                                 #in_df['Actors_bow'] +
-                                 #in_df['Director_bow'] +
-                                 #in_df['Genre_bow'] +
-                                 #in_df['Production_bow'] +
-                                 #in_df['Writer_bow'])
-
-        #in_df = in_df.drop(columns=bow_col_list)
         self.input_df = in_df
 
 
@@ -232,7 +221,6 @@ class Movies:
             key_url = url + key
             r = requests.get(key_url)
             json_data = r.json()
-            #pbar.set_description("importing " + json_data['Title'] + "...")
             pbar.set_description("Importing " + year)
             out_list.append(json_data)
 
