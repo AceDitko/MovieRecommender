@@ -119,9 +119,28 @@ class Movies:
             in_df = in_df.merge(df, left_index=True, right_index=True)
 
         print("Dataframes joined")
+
+        for col in form_cols:
+            self.rare_encode(col, in_df)
+
         self.input_df = in_df
 
+    def rare_encode(self, col_str, in_df):
 
+        col_str += "_"
+
+        in_cols = [col for col in in_df.columns if col_str in col]
+        temp_df = in_df[in_cols].apply(pd.Series.value_counts)
+        temp_df.fillna(0, inplace = True)
+
+        temp_df['Sum'] = 0
+        for col in in_cols:
+            temp_df['Sum'] += temp_df[col]
+
+        temp_df = temp_df[temp_df['Sum'] > 1]
+        pop_vals = temp_df.index.to_list()
+        for col in in_cols:
+            in_df[col] = in_df[col].apply(lambda x: x if str(x) in pop_vals else 'other')
 
     def load_dataset(self, start_year):
         '''
