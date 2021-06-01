@@ -15,6 +15,20 @@ from matplotlib import patches as mpatches
 from oauth2client.service_account import ServiceAccountCredentials
 pd.options.mode.chained_assignment = None  # default='warn'
 
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.impute import SimpleImputer
+from sklearn.impute import KNNImputer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import GridSearchCV
+from sklearn.feature_extraction.text import TfidfVectorizer
+
 class Movies:
 
     def __init__(self, start_year="2018"):
@@ -69,6 +83,7 @@ class Movies:
 
         self.clean_data()
         self.create_features()
+        self.preprocess()
 
     def clean_data(self):
 
@@ -162,6 +177,45 @@ class Movies:
         pop_vals = temp_df.index.to_list()
         for col in in_cols:
             in_df[col] = in_df[col].apply(lambda x: x if str(x) in pop_vals else 'other')
+
+    def preprocess(self):
+
+        in_df = self.input_df
+
+        numerical_cols = ['BoxOffice', 'Metascore', 'Runtime', 'Year', 'imdbRating', 'Days to View', 'Days Since Release']
+        categorical_cols = ['Rated', 'Format']
+        form_cols = ['Genre', 'Actors', 'Director', 'Production', 'Writer']
+
+        for col in form_cols:
+            col_str = col + "_"
+            in_cols = [col for col in in_df.columns if col_str in col]
+            for col2 in in_cols:
+                categorical_cols.append(col2)
+
+        features = numerical_cols + categorical_cols
+
+        for i in features:
+            in_df[i] = in_df[i].replace('N/A',np.NaN)
+            in_df[i] = in_df[i].replace('',np.NaN)
+            in_df[i] = in_df[i].replace(' ',np.NaN)
+            in_df[i] = in_df[i].replace('missing_value',np.NaN)
+
+        numerical_transformer = SimpleImputer(missing_values=np.NaN,
+                                            strategy='median')
+
+        categorical_transformer = Pipeline(steps=[
+            ('imputer', SimpleImputer(missing_values=np.NaN,
+                                    strategy='most_frequent')),
+            ('onehot', OneHotEncoder(handle_unknown='ignore'))
+        ])
+
+        self.preprocessor = ColumnTransformer(
+            transformers=[
+                ('num', numerical_transformer, numerical_cols),
+                ('cat', categorical_transformer, categorical_cols)
+                #('tfidf', tfidf_transformer, plots)
+            ]
+        ) 
 
     def load_dataset(self, start_year):
         '''
