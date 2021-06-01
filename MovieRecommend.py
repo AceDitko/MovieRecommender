@@ -75,6 +75,23 @@ class Movies:
         delta = d1 - d0
         return delta.days
 
+    def is_weekday(self, date):
+
+        dt_obj = datetime.datetime.strptime(date, '%d/%m/%Y')
+        
+        if dt_obj.weekday() < 5:
+            return "Weekday"
+        else:
+            return "Weekend"
+
+    def is_cinema(self, format):
+
+        streams = ['Netflix', 'Amazon', 'NowTv', 'Plex']
+        if format in streams:
+            return "Stream"
+        else:
+            return "Cinema"
+
     def get_df(self):
 
         return self.input_df
@@ -114,6 +131,9 @@ class Movies:
         in_df = self.input_df
         
         print("Dataframe assigned for features")
+
+        in_df['Is_cinema'] = in_df['Format'].apply(lambda x: self.is_cinema(x))
+        in_df['Is_weekday'] = in_df['Viewing Date'].apply(lambda x: self.is_weekday(x))
 
         in_df['Writer'] = in_df['Writer'].apply(lambda x: re.sub("[\(\[].*?[\)\]]", "", str(x)))
         form_cols = ['Genre', 'Actors', 'Director', 'Production', 'Writer']
@@ -183,7 +203,7 @@ class Movies:
         in_df = self.input_df
 
         numerical_cols = ['BoxOffice', 'Metascore', 'Runtime', 'Year', 'imdbRating', 'Days to View', 'Days Since Release']
-        categorical_cols = ['Rated', 'Format']
+        categorical_cols = ['Rated', 'Format', 'Is_cinema', 'Is_weekday']
         form_cols = ['Genre', 'Actors', 'Director', 'Production', 'Writer']
 
         for col in form_cols:
@@ -252,6 +272,7 @@ class Movies:
         c_imdb_df = pd.concat(self.imdb_df)
         c_sheet_df = pd.concat(self.spreadsheet_df)
         c_imdb_df['Format'] = c_sheet_df['Format'].values
+        c_imdb_df['Viewing Date'] = c_sheet_df['Viewing Date'].values
         c_imdb_df['Days to View'] = c_sheet_df['Days to View'].values
         c_imdb_df['Days Since Release'] = c_sheet_df['Release Date'].apply(self.getdays)
         c_imdb_df['True Rating'] = c_sheet_df['True Rating'].apply(lambda x: int(x))
