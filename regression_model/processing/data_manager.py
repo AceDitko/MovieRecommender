@@ -9,6 +9,37 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 pd.options.mode.chained_assignment = None  # default='warn'
 
+# repo - pre commit hooks:
+#    id: end of file fixer
+#    id: trailing white space
+#    id: check docstring first
+#    id: check merge conflict
+#    id: mixed line ending
+#   args: fix=lf
+# 
+# repo: commitizen
+#    id: commitizen
+# 
+# repo: black
+#    id: black
+#    language version: 3.11
+# 
+# repo: flake8
+#    id: flake8
+# look at course I guess
+# 
+# repo: interrogate
+#   id: interrogate
+#   args: quiet, fail under 95
+#
+# repo: pydocstyle
+#   id: pydocstyle
+#
+# repo: yamllint
+#   id: yamllint
+#   args: -s, -c=.yamllint (we don't know what these are but carl copied them)
+
+
 start_year = 2018
 url = 'https://docs.google.com/spreadsheets/d/1w-LyhsGUqNFiFqsF2QVgfA5MARTMRWFxMbG-FiWQf9c/edit#gid=621622277'
 
