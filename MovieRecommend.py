@@ -43,7 +43,7 @@ class Movies:
         self.spreadsheet_df = []
         self.imdb_df = []
         self.input_df = pd.DataFrame()
-        self.year_dict = {"2018": 0, "2019": 1, "2020": 2, "2021": 3}
+        self.year_dict = {"2018": 0, "2019": 1, "2020": 2, "2021": 3, "2022": 4, "2023": 5}
 
         self.rt_ratings = []
         self.j_ratings = []
@@ -316,17 +316,19 @@ class Movies:
 
         file_name = year+"_imdb.json"
 
-        api_key = "?apikey=72bc447a&t="
+        api_key = "?apikey=72bc447a&i="
         url = "http://omdbapi.com/"
 
-        search_df = in_df[['Name', 'Release Date']]
-        search_df['search_title'] = search_df['Name'].apply(self.name_search_string)
-        search_df['search_year'] = search_df['Release Date'].apply(self.year_search_string)
+        search_df = in_df[['Name', 'Release Date', 'IMDB ID']]
+        #search_df['search_title'] = search_df['Name'].apply(self.name_search_string)
+        #search_df['search_year'] = search_df['Release Date'].apply(self.year_search_string)
 
-        search_df['counts'] = search_df['search_title'].map(search_df['search_title'].value_counts())
-        search_df['counts'].apply(lambda x: int(x))
+        #search_df['counts'] = search_df['search_title'].map(search_df['search_title'].value_counts())
+        #search_df['counts'].apply(lambda x: int(x))
         
-        search_df['search_key'] = np.where(search_df['counts'] == 1, api_key + search_df['search_title'], api_key+search_df['search_title'] + "&y=" + search_df['search_year'])
+        #search_df['search_key'] = np.where(search_df['counts'] == 1, api_key + search_df['search_title'], api_key+search_df['search_title'] + "&y=" + search_df['search_year'])
+
+        search_df['search_key'] = api_key + search_df['IMDB ID']
 
         out_list = []
 
