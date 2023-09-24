@@ -46,18 +46,17 @@ def load_dataset() -> pd.DataFrame:
             return pd.read_json('movie_db.json')
         else:
             return create_moviedb()
-            
-            #for i in range(0, year_diff+1):
-            #    year = int(start_year) + i
-            #    self.pull_from_sheet(str(year))
-            
-            #self.merge_sheets()
 
-            #self.input_df.to_json('movie_db.json')
 
 def create_moviedb() -> pd.DataFrame:
     '''Creates the movie dataset if it does not exist.
     
+    pull_from_sheet() creates a single dataframe containing all user data 
+    pulled from the online google sheet.
+    pull_from_imdb() queries imdb using this dataframe as input and returns
+    a single dataframe containing all of the imdb data on the submitted movies
+    joined with some of the user provided information contained in the google
+    sheet.
     '''
 
     return pull_from_imdb(pull_from_sheet)
@@ -66,12 +65,10 @@ def create_moviedb() -> pd.DataFrame:
 def pull_from_sheet() -> pd.DataFrame:
         '''
         Pulls the data (created by user input) from the google sheet 
-        for a given year and stores it in a json object, appending 
-        each json object to a dataframe in the class. Calls the
-        pull_from_imdb method using the aformentioned json object 
-        as input. 
+        and concatenates it into a single dataframe which is then returned. 
         '''
 
+        # Authenticate with the google sheet
         scope = [   'https://spreadsheets.google.com/feeds',
                     'https://www.googleapis.com/auth/spreadsheets',
                     'https://www.googleapis.com/auth/drive.file',
@@ -80,17 +77,18 @@ def pull_from_sheet() -> pd.DataFrame:
         creds = ServiceAccountCredentials.from_json_keyfile_name('service_account.json', scope)
         client = gspread.authorize(creds)
 
+        # Obtain the current year and number of sheets that should exist
         today = datetime.date.today()
         current_year = [int(i) for i in today.strftime('%d/%m/%Y').split('/')][2]
 
         year_diff = current_year - start_year
 
+        # Create the dataframes of each year's data and append to list
         spreadsheet_df_list = []
 
         for i in range(0, year_diff+1):
             year = int(start_year) + 1
              
-
             sheet_title = "Films " + year
             sheet = client.open_by_url(url).worksheet(sheet_title)
             json_sheet = sheet.get_all_records()
@@ -98,14 +96,18 @@ def pull_from_sheet() -> pd.DataFrame:
 
             spreadsheet_df_list.append(pd.read_json(json_object))
         
+        # Concatenate the list of dfs into a single dataframe
         return pd.concat(spreadsheet_df_list)
 
 
 def pull_from_imdb(*, in_df: pd.DataFrame) -> pd.DataFrame:
     '''
-    Scrapes imdb for movie data for each film using omdb. The year
-    is used to differentiate films if duplicates of a film title are
-    present in the data (e.g. in the case of film remakes). 
+    Scrapes imdb for movie data for each film using omdb.
+
+    Uses the IMDB ID stored in the google sheet to query omdb and pull data
+    from imdb, which is stored in a single output dataframe. Once this dataframe
+    is created, relevant information from the google sheet data is added by
+    calling update_imdb_df() and then this final combined dataframe is returned. 
     '''
 
     in_df = in_df[in_df.Name != ""]
@@ -153,6 +155,7 @@ def update_imdb_df(*, imdb_df: pd.DataFrame, spreadsheet_df: pd.DataFrame) -> pd
 
 
 def name_search_string(self, title):
+    '''Converts a string movie title into an omdb compatible search name key.'''
     substrings = str(title).split(" ")
     search_string = ""
     for substring in substrings:
@@ -160,6 +163,7 @@ def name_search_string(self, title):
     return search_string
 
 
-def year_search_string(self, date):     
+def year_search_string(self, date):
+    '''Converts a date into an omdb compatible search date key.'''
     dates = date.split("/")
     return str(dates[-1])
