@@ -16,18 +16,18 @@ pd.options.mode.chained_assignment = None  # default='warn'
 #    id: check merge conflict
 #    id: mixed line ending
 #   args: fix=lf
-# 
+#
 # repo: commitizen
 #    id: commitizen
-# 
+#
 # repo: black
 #    id: black
 #    language version: 3.11
-# 
+#
 # repo: flake8
 #    id: flake8
 # look at course I guess
-# 
+#
 # repo: interrogate
 #   id: interrogate
 #   args: quiet, fail under 95
@@ -38,7 +38,7 @@ pd.options.mode.chained_assignment = None  # default='warn'
 # repo: yamllint
 #   id: yamllint
 #   args: -s, -c=.yamllint (we don't know what these are but carl copied them)
-
+#test
 
 start_year = 2018
 url = 'https://docs.google.com/spreadsheets/d/1w-LyhsGUqNFiFqsF2QVgfA5MARTMRWFxMbG-FiWQf9c/edit#gid=621622277'
@@ -70,9 +70,9 @@ def load_dataset() -> pd.DataFrame:
 
         If movie_db.json exists, reads the file and returns it as a df.
         If movie_db.json does not exist, creates the file using imdb info pulled
-        using the omdb api and returns it as a df. 
+        using the omdb api and returns it as a df.
         '''
-        
+
         if Path('movie_db.json').is_file():
             return pd.read_json('movie_db.json')
         else:
@@ -81,8 +81,8 @@ def load_dataset() -> pd.DataFrame:
 
 def create_moviedb() -> pd.DataFrame:
     '''Creates the movie dataset if it does not exist.
-    
-    pull_from_sheet() creates a single dataframe containing all user data 
+
+    pull_from_sheet() creates a single dataframe containing all user data
     pulled from the online google sheet.
     pull_from_imdb() queries imdb using this dataframe as input and returns
     a single dataframe containing all of the imdb data on the submitted movies
@@ -95,8 +95,8 @@ def create_moviedb() -> pd.DataFrame:
 
 def pull_from_sheet() -> pd.DataFrame:
         '''
-        Pulls the data (created by user input) from the google sheet 
-        and concatenates it into a single dataframe which is then returned. 
+        Pulls the data (created by user input) from the google sheet
+        and concatenates it into a single dataframe which is then returned.
         '''
 
         # Authenticate with the google sheet
@@ -119,14 +119,14 @@ def pull_from_sheet() -> pd.DataFrame:
 
         for i in range(0, year_diff+1):
             year = int(start_year) + 1
-             
+
             sheet_title = "Films " + year
             sheet = client.open_by_url(url).worksheet(sheet_title)
             json_sheet = sheet.get_all_records()
             json_object = json.dumps(json_sheet)
 
             spreadsheet_df_list.append(pd.read_json(json_object))
-        
+
         # Concatenate the list of dfs into a single dataframe
         return pd.concat(spreadsheet_df_list)
 
@@ -138,7 +138,7 @@ def pull_from_imdb(*, in_df: pd.DataFrame) -> pd.DataFrame:
     Uses the IMDB ID stored in the google sheet to query omdb and pull data
     from imdb, which is stored in a single output dataframe. Once this dataframe
     is created, relevant information from the google sheet data is added by
-    calling update_imdb_df() and then this final combined dataframe is returned. 
+    calling update_imdb_df() and then this final combined dataframe is returned.
     '''
 
     in_df = in_df[in_df.Name != ""]
@@ -152,7 +152,7 @@ def pull_from_imdb(*, in_df: pd.DataFrame) -> pd.DataFrame:
 
     #search_df['counts'] = search_df['search_title'].map(search_df['search_title'].value_counts())
     #search_df['counts'].apply(lambda x: int(x))
-    
+
     #search_df['search_key'] = np.where(search_df['counts'] == 1, api_key + search_df['search_title'], api_key+search_df['search_title'] + "&y=" + search_df['search_year'])
 
     search_df['search_key'] = api_key + search_df['IMDB ID']
