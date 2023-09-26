@@ -1,3 +1,4 @@
+"""Load/manipulate/process input data."""
 import datetime
 from pathlib import Path
 import pandas as pd
@@ -10,28 +11,12 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
-# repo: interrogate
-#   id: interrogate
-#   args: quiet, fail under 95
-#
-# repo: pydocstyle
-#   id: pydocstyle
-#
-# repo: yamllint
-#   id: yamllint
-#   args: -s, -c=.yamllint (we don't know what these are but carl copied them)
-# test
-
 start_year = 2018
 url = "https://docs.google.com/spreadsheets/d/1w-LyhsGUqNFiFqsF2QVgfA5MARTMRWFxMbG-FiWQf9c/edit#gid=621622277"
 
 
-def getdays(date):
-    """
-    Creates an integer number representing the difference between
-    a given date and today's date.
-    """
-
+def getdays(*, date: str) -> int:
+    """Calculate difference in days between today and given date."""
     test_date = date
     temp_test_dates = test_date.split("/")
     test_dates = [int(i) for i in temp_test_dates]
@@ -49,13 +34,12 @@ def getdays(date):
 
 def load_dataset() -> pd.DataFrame:
     """
-    Loads movie dataset into input_df.
+    Load movie dataset into input_df.
 
     If movie_db.json exists, reads the file and returns it as a df.
     If movie_db.json does not exist, creates the file using imdb info pulled
     using the omdb api and returns it as a df.
     """
-
     if Path("movie_db.json").is_file():
         return pd.read_json("movie_db.json")
     else:
@@ -63,7 +47,7 @@ def load_dataset() -> pd.DataFrame:
 
 
 def create_moviedb() -> pd.DataFrame:
-    """Creates the movie dataset if it does not exist.
+    """Create the movie dataset if it does not exist.
 
     pull_from_sheet() creates a single dataframe containing all user data
     pulled from the online google sheet.
@@ -72,16 +56,11 @@ def create_moviedb() -> pd.DataFrame:
     joined with some of the user provided information contained in the google
     sheet.
     """
-
     return pull_from_imdb(pull_from_sheet)
 
 
 def pull_from_sheet() -> pd.DataFrame:
-    """
-    Pulls the data (created by user input) from the google sheet
-    and concatenates it into a single dataframe which is then returned.
-    """
-
+    """Pull input data and concatenate into single sheet."""
     # Authenticate with the google sheet
     scope = [
         "https://spreadsheets.google.com/feeds",
@@ -120,14 +99,13 @@ def pull_from_sheet() -> pd.DataFrame:
 
 def pull_from_imdb(*, in_df: pd.DataFrame) -> pd.DataFrame:
     """
-    Scrapes imdb for movie data for each film using omdb.
+    Scrape imdb for movie data for each film using omdb.
 
     Uses the IMDB ID stored in the google sheet to query omdb and pull data
     from imdb, which is stored in a single output dataframe. Once this dataframe
     is created, relevant information from the google sheet data is added by
     calling update_imdb_df() and then this final combined dataframe is returned.
     """
-
     in_df = in_df[in_df.Name != ""]
 
     api_key = "?apikey=72bc447a&i="
@@ -163,8 +141,7 @@ def pull_from_imdb(*, in_df: pd.DataFrame) -> pd.DataFrame:
 def update_imdb_df(
     *, imdb_df: pd.DataFrame, spreadsheet_df: pd.DataFrame
 ) -> pd.DataFrame:
-    """Adds additional fields from spreadsheet to df created from omdb data."""
-
+    """Add additional fields from spreadsheet to df created from omdb data."""
     imdb_df["Format"] = spreadsheet_df["Format"].values
     imdb_df["Viewing Date"] = spreadsheet_df["Viewing Data"].values
     imdb_df["Days to View"] = spreadsheet_df["Days to View"].values
@@ -186,7 +163,7 @@ def update_imdb_df(
 
 
 def name_search_string(self, title):
-    """Converts a string movie title into an omdb compatible search name key."""
+    """Convert a string movie title into an omdb compatible search name key."""
     substrings = str(title).split(" ")
     search_string = ""
     for substring in substrings:
@@ -195,6 +172,6 @@ def name_search_string(self, title):
 
 
 def year_search_string(self, date):
-    """Converts a date into an omdb compatible search date key."""
+    """Convert a date into an omdb compatible search date key."""
     dates = date.split("/")
     return str(dates[-1])
