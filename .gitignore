@@ -3,3 +3,4 @@ __pycache__
 .vscode
 service_account.json
 movie_db.json
+.yamllint

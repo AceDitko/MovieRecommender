@@ -6,10 +6,16 @@ import json
 import tqdm
 from io import StringIO
 import requests
+from sklearn.pipeline import Pipeline
+import joblib
+import typing as t
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 pd.options.mode.chained_assignment = None  # default='warn'
+
+from regression_model import __version__ as _version
+from regression_model.config.core import DATASET_DIR, TRAINED_MODEL_DIR, config
 
 start_year = 2018
 url = "https://docs.google.com/spreadsheets/d/1w-LyhsGUqNFiFqsF2QVgfA5MARTMRWFxMbG-FiWQf9c/edit#gid=621622277"
@@ -175,3 +181,37 @@ def year_search_string(self, date):
     """Convert a date into an omdb compatible search date key."""
     dates = date.split("/")
     return str(dates[-1])
+
+
+def save_pipeline(*, pipeline_to_persist: Pipeline) -> None:
+    """Persist the pipeline.
+
+    Save the versioned model, and overwrite any previously saved models. This
+    ensures that when the package is published, there is only one trained model
+    that can be called.
+    """
+    # Prepare versioned save file name
+    save_file_name = f"{config.app_config.pipeline_save_file}{_version}.pk1"
+    save_path = TRAINED_MODEL_DIR / save_file_name
+
+    remove_old_pipelines(file_to_keep=[save_file_name])
+    joblib.dump(pipeline_to_persist, save_path)
+
+
+def load_pipeline(*, file_name: str) -> Pipeline:
+    """Load the persisted pipeline."""
+    file_path = TRAINED_MODEL_DIR / file_name
+    trained_model = joblib.load(filenmae=file_path)
+    return trained_model
+
+
+def remove_old_pipelines(*, files_to_keep: t.List[str]) -> None:
+    """Remove old model pipelines.
+
+    This is to ensure there is a simple one-to-one mapping between the package
+    version and the model version to be imported and used by other applications.
+    """
+    do_not_delete = files_to_keep + ["__init__.py"]
+    for model_file in TRAINED_MODEL_DIR.iterdir():
+        if model_file.name not in do_not_delete:
+            model_file.unlink()
