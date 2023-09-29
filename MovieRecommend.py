@@ -170,6 +170,23 @@ class Movies:
         print("Form columns split")
         print(in_df.columns)
 
+        temp_df = in_df[form_cols[0]]
+        for col in form_cols[1:]:
+            temp_df += in_df[col]
+
+        print(temp_df)
+
+        temp_df2 = pd.DataFrame(temp_df.values.tolist()).add_prefix("Word_")
+        for col in temp_df2.columns:
+            temp_df2[col] = temp_df2[col].str.replace("None", "nan")
+
+        print(temp_df2)
+
+        print("Print encoded df")
+        self.rare_encode("Word", temp_df2)
+        print(temp_df2)
+        print()
+
         g_df = pd.DataFrame(in_df.Genre.values.tolist()).add_prefix("Genre_")
         a_df = pd.DataFrame(in_df.Actors.values.tolist()).add_prefix("Actors_")
         d_df = pd.DataFrame(in_df.Director.values.tolist()).add_prefix("Director_")
@@ -202,11 +219,17 @@ class Movies:
         temp_df.fillna(0, inplace=True)
 
         temp_df["Sum"] = 0
+        print("Data frame pre count")
+        print(temp_df)
         for col in in_cols:
             temp_df["Sum"] += temp_df[col]
 
         temp_df = temp_df[temp_df["Sum"] > 1]
+        print("Temp_df popular entries")
+        print(temp_df)
         pop_vals = temp_df.index.to_list()
+        print("popular values")
+        print(pop_vals)
         for col in in_cols:
             in_df[col] = in_df[col].apply(
                 lambda x: x if str(x) in pop_vals else "other"
