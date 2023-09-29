@@ -166,47 +166,30 @@ class Movies:
             in_df[col] = in_df[col].str.replace("N/A", "nan")
             in_df[col] = in_df[col].apply(lambda x: x.lower())
             in_df[col] = in_df[col].apply(lambda x: re.split(",|/", x))
+            in_df[col] = in_df[col].replace("nan", None)
 
         print("Form columns split")
-        print(in_df.columns)
 
         temp_df = in_df[form_cols[0]]
         for col in form_cols[1:]:
             temp_df += in_df[col]
 
-        print(temp_df)
-
         temp_df2 = pd.DataFrame(temp_df.values.tolist()).add_prefix("Word_")
-        for col in temp_df2.columns:
-            temp_df2[col] = temp_df2[col].str.replace("None", "nan")
 
-        print(temp_df2)
-
-        print("Print encoded df")
         self.rare_encode("Word", temp_df2)
+
+        # to_join_df = temp_df2["Word_0"]
+        # for col in temp_df2.columns[1:]:
+        #    to_join_df += temp_df2[col]
+
+        to_join_df = temp_df2[temp_df2.columns.tolist()].values.tolist()
+
         print(temp_df2)
-        print()
+        print(to_join_df)
 
-        g_df = pd.DataFrame(in_df.Genre.values.tolist()).add_prefix("Genre_")
-        a_df = pd.DataFrame(in_df.Actors.values.tolist()).add_prefix("Actors_")
-        d_df = pd.DataFrame(in_df.Director.values.tolist()).add_prefix("Director_")
-        p_df = pd.DataFrame(in_df.Production.values.tolist()).add_prefix("Production_")
-        w_df = pd.DataFrame(in_df.Writer.values.tolist()).add_prefix("Writer_")
+        to_join_df = pd.DataFrame({"Bag_of_words": to_join_df})
 
-        print("Created new dataframes of split columns")
-        print(g_df.columns)
-
-        join_dfs = [g_df, a_df, d_df, p_df, w_df]
-
-        print("Joining dataframes")
-
-        for df in join_dfs:
-            in_df = in_df.merge(df, left_index=True, right_index=True)
-
-        print("Dataframes joined")
-
-        for col in form_cols:
-            self.rare_encode(col, in_df)
+        in_df = in_df.merge(to_join_df, left_index=True, right_index=True)
 
         self.input_df = in_df
 
@@ -249,13 +232,7 @@ class Movies:
             "Days Since Release",
         ]
         categorical_cols = ["Rated", "Format", "Is_cinema", "Is_weekday"]
-        form_cols = ["Genre", "Actors", "Director", "Production", "Writer"]
-
-        for col in form_cols:
-            col_str = col + "_"
-            in_cols = [col for col in in_df.columns if col_str in col]
-            for col2 in in_cols:
-                categorical_cols.append(col2)
+        form_cols = ["Bag_of_words"]
 
         features = numerical_cols + categorical_cols
 
@@ -264,6 +241,7 @@ class Movies:
             in_df[i] = in_df[i].replace("", np.NaN)
             in_df[i] = in_df[i].replace(" ", np.NaN)
             in_df[i] = in_df[i].replace("missing_value", np.NaN)
+            in_df[i] = in_df[i].replace("nan", np.NaN)
 
         numerical_transformer = SimpleImputer(missing_values=np.NaN, strategy="median")
 
