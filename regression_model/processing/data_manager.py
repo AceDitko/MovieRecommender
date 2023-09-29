@@ -38,7 +38,7 @@ def getdays(*, date: str) -> int:
     return delta.days
 
 
-def load_dataset() -> pd.DataFrame:
+def load_dataset(*, file_name: str) -> pd.DataFrame:
     """
     Load movie dataset into input_df.
 
@@ -46,13 +46,13 @@ def load_dataset() -> pd.DataFrame:
     If movie_db.json does not exist, creates the file using imdb info pulled
     using the omdb api and returns it as a df.
     """
-    if Path("movie_db.json").is_file():
-        return pd.read_json("movie_db.json")
+    if Path(f"{DATASET_DIR}/{file_name}").is_file():
+        return pd.read_json("f{DATASET_DIR}/{file_name}")
     else:
-        return create_moviedb()
+        return create_moviedb(file_name)
 
 
-def create_moviedb() -> pd.DataFrame:
+def create_moviedb(*, file_name: str) -> pd.DataFrame:
     """Create the movie dataset if it does not exist.
 
     pull_from_sheet() creates a single dataframe containing all user data
@@ -61,7 +61,11 @@ def create_moviedb() -> pd.DataFrame:
     a single dataframe containing all of the imdb data on the submitted movies
     joined with some of the user provided information contained in the google
     sheet.
+    When create_moviedb() creates the dataset, it saves it to the config
+    specified file name in the DATASET_DIR.
     """
+    moviedb = pull_from_imdb(pull_from_sheet)
+    moviedb.to_json("f{DATASET_DIR}/{file_name}")
     return pull_from_imdb(pull_from_sheet)
 
 
