@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from pydantic import BaseModel
-from strictyaml import YAML, load
+from strictyaml import YAML, load, List
 
 import regression_model
 
@@ -24,10 +24,24 @@ class AppConfig(BaseModel):
     pipeline_save_file: str
 
 
+class ModelConfig(BaseModel):
+    """All config relevant to model training and feature engineering."""
+
+    target: str
+    features: List[str]
+    test_size: float
+    random_state: int
+    alpha: float
+    numerical_vars: List[str]
+    categorical_vars: List[str]
+    create_vars: List[str]
+
+
 class Config(BaseModel):
     """Master config object."""
 
     app_config: AppConfig
+    model_config: ModelConfig
 
 
 def find_config_file() -> Path:
