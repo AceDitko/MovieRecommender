@@ -146,7 +146,9 @@ class Movies:
         in_df["Writer"] = in_df["Writer"].apply(
             lambda x: re.sub("[\(\[].*?[\)\]]", "", str(x))
         )
-        form_cols = ["Genre", "Actors", "Director", "Production", "Writer"]
+        form_cols = ["Actors", "Director", "Production", "Writer"]
+
+        print(in_df["Director"])
 
         def dropPunc(doc):
             tokens = []
@@ -166,7 +168,6 @@ class Movies:
             in_df[col] = in_df[col].str.replace("N/A", "nan")
             in_df[col] = in_df[col].apply(lambda x: x.lower())
             in_df[col] = in_df[col].apply(lambda x: re.split(",|/", x))
-            in_df[col] = in_df[col].replace("nan", None)
 
         print("Form columns split")
 
@@ -175,17 +176,13 @@ class Movies:
             temp_df += in_df[col]
 
         temp_df2 = pd.DataFrame(temp_df.values.tolist()).add_prefix("Word_")
+        for col in temp_df2.columns:
+            temp_df2[col] = temp_df2[col].replace("nan", np.nan)
+            temp_df2[col] = temp_df2[col].fillna(value=np.nan)
 
         self.rare_encode("Word", temp_df2)
 
-        # to_join_df = temp_df2["Word_0"]
-        # for col in temp_df2.columns[1:]:
-        #    to_join_df += temp_df2[col]
-
         to_join_df = temp_df2[temp_df2.columns.tolist()].values.tolist()
-
-        print(temp_df2)
-        print(to_join_df)
 
         to_join_df = pd.DataFrame({"Bag_of_words": to_join_df})
 
@@ -208,11 +205,7 @@ class Movies:
             temp_df["Sum"] += temp_df[col]
 
         temp_df = temp_df[temp_df["Sum"] > 1]
-        print("Temp_df popular entries")
-        print(temp_df)
         pop_vals = temp_df.index.to_list()
-        print("popular values")
-        print(pop_vals)
         for col in in_cols:
             in_df[col] = in_df[col].apply(
                 lambda x: x if str(x) in pop_vals else "other"
