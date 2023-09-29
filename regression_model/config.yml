@@ -1,0 +1,62 @@
+---
+# Package Overview
+package_name: regression_model
+
+# Data Files:
+training_data_file: movie_db.json
+test_data_file: movie_db_test.json
+
+# Variables
+# The variable to predict (True Rating)
+target: True Rating
+
+pipeline_name: regression_model
+pipeline_save_file: regression_model_output_v
+
+features:
+ - BoxOffice
+ - Metascore
+ - Runtime
+ - Year
+ - imdbRating
+ - Days to View
+ - Days Since Release
+ - Rated
+ - Format
+ - Is_cinema
+ - Is_weekday
+ - Plot
+
+# set train/test split
+test_size: 0.1
+
+# set random seed
+random_state: 42
+
+alpha: 0.001
+
+# numerical variables
+numerical_vars:
+ - BoxOffice
+ - Metascore
+ - Runtime
+ - Year
+ - imdbRating
+ - Days to View
+ - Days Since Release
+ - Rated
+
+# categorical variables
+categorical_vars:
+ - Format
+ - Is_cinema
+ - Is_weekday
+ - Plot
+
+# variables to create
+create_vars:
+ - Genre
+ - Actors
+ - Director
+ - Producer
+ - Writer
