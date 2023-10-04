@@ -60,3 +60,11 @@ create_vars:
  - Director
  - Producer
  - Writer
+
+# streaming services (used for Is_cinema)
+streaming_services:
+ - Netflix
+ - Amazon
+ - Disney+
+ - NowTv
+ - Plex

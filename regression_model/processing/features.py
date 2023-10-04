@@ -7,6 +7,8 @@ import datetime
 import re
 from sklearn.base import BaseEstimator, TransformerMixin
 
+from regression_model.config.core import config
+
 
 class IsCinemaCreator(BaseEstimator, TransformerMixin):
     """Create Is_cinema feature."""
@@ -98,8 +100,7 @@ def BowCastCreator(BaseEstimator, TransformerMixin):
 
 def is_cinema(format):
     """Determine if film was streamed or watched in cinema."""
-    streams = ["Netflix", "Amazon", "NowTv", "Plex", "Disney+"]
-    if format in streams:
+    if format in config.model_config.streaming_services:
         return "Stream"
     else:
         return "Cinema"

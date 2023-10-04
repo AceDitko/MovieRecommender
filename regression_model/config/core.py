@@ -35,6 +35,7 @@ class ModelConfig(BaseModel):
     numerical_vars: List[str]
     categorical_vars: List[str]
     create_vars: List[str]
+    streaming_services: List[str]
 
 
 class Config(BaseModel):
