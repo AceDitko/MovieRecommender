@@ -34,7 +34,8 @@ class ModelConfig(BaseModel):
     alpha: float
     numerical_vars: List[str]
     categorical_vars: List[str]
-    create_vars: List[str]
+    tfidf_vars: List[str]
+    cast_and_crew_vars: List[str]
     streaming_services: List[str]
 
 

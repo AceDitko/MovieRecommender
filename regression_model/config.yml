@@ -51,11 +51,14 @@ categorical_vars:
  - Format
  - Is_cinema
  - Is_weekday
+ - Genre
+
+# variables to undergo tfidf
+tfidf_vars:
  - Plot
 
-# variables to create
-create_vars:
- - Genre
+# variables to feed into cast and crew bag of words
+cast_and_crew_vars:
  - Actors
  - Director
  - Producer
