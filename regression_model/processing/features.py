@@ -34,7 +34,7 @@ class IsCinemaCreator(BaseEstimator, TransformerMixin):
         return X
 
 
-def IsWeekdayCreator(BaseEstimator, TransformerMixin):
+class IsWeekdayCreator(BaseEstimator, TransformerMixin):
     """Create Is_weekday feature."""
 
     def __init__(self):
@@ -58,7 +58,7 @@ def IsWeekdayCreator(BaseEstimator, TransformerMixin):
         return X
 
 
-def BowCastCreator(BaseEstimator, TransformerMixin):
+class BowCastCreator(BaseEstimator, TransformerMixin):
     """Create bag of words of cast and crew info feature called bow_cast."""
 
     def __init__(self, variables: List[str]):
@@ -96,6 +96,41 @@ def BowCastCreator(BaseEstimator, TransformerMixin):
         X = X.merge(to_join_df, left_index=True, right_index=True)
 
         return X
+
+
+class Tfidf_Creator(BaseEstimator, TransformerMixin):
+    """Handle tfidf vectorization for tfidf_vars."""
+
+    def __init__(self, variables=None):
+        """Check that variables is of type list."""
+        if not isinstance(variables, list):
+            raise ValueError("Variables should be a list")
+
+        self.variables = variables
+
+    def fit(self, X: pd.DataFrame, y: pd.Series = None):
+        """Fit the tfidf transformer."""
+        # Copy the df as not to overwrite original
+        X = X.copy()
+
+        self.tfidf_transformer = TfidfVectorizer()
+        X = X[self.variables].squeeze()
+        self.tfidf_transformer.fit(X)
+
+        self.feature_names = self.tfidf_transformer.get_feature_names_out()
+        return self
+
+    def transform(self, X: pd.DataFrame):
+        """Transform the data to get the tfidf scores."""
+        # Copy the df as not to overwrite original
+        X = X.copy()
+
+        X = X[self.variables].squeeze()
+        X = self.tfidf_transformer.transform(X)
+
+        X_df = pd.DataFrame(X.toarray(), columns=self.feature_names)
+
+        return X_df
 
 
 def is_cinema(format):
