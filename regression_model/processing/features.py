@@ -6,6 +6,8 @@ import numpy as np
 import datetime
 import re
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.model_selection import GridSearchCV
+from xgboost import XGBRegressor
 
 from regression_model.config.core import config
 
@@ -98,7 +100,7 @@ class BowCastCreator(BaseEstimator, TransformerMixin):
         return X
 
 
-class Tfidf_Creator(BaseEstimator, TransformerMixin):
+class TfidfCreator(BaseEstimator, TransformerMixin):
     """Handle tfidf vectorization for tfidf_vars."""
 
     def __init__(self, variables=None):
@@ -131,6 +133,60 @@ class Tfidf_Creator(BaseEstimator, TransformerMixin):
         X_df = pd.DataFrame(X.toarray(), columns=self.feature_names)
 
         return X_df
+
+
+class XgboostHandler(BaseEstimator, TransformerMixin):
+    """Handle the Xgboost model for the pipeline."""
+
+    def __init__(self, run_gs: bool = False):
+        """Initialise the class."""
+        if not isinstance(run_gs, bool):
+            raise ValueError("Run_gs should be of type bool")
+
+        self.run_gs = run_gs
+
+    def fit(self, X: pd.DataFrame, y: pd.Series = None):
+        """Fit the xgboost model."""
+        # copy the inputs so as not to overwrite them
+        X = X.copy()
+        y = y.copy()
+
+        if self.run_gs:
+            xgb_model = XGBRegressor(n_estimators=1000, learning_rate=0.05)
+            self.grid = GridSearchCV(
+                xgb_model,
+                param_grid=config.model_config.gs_params,
+                scoring="r2",
+                verbose=2,
+            )
+            self.grid.fit(X, y)
+            config.model_config.best_params = self.grid.best_params_
+
+        self.best_params = config.model_config.best_params
+
+        self.xgb_model = XGBRegressor(
+            n_estimators=self.best_params["n_estimators"],
+            learning_rate=0.05,
+            lsample_bytree=self.best_params["colsample_bytree"],
+            gamma=self.best_params["gamma"],
+            max_depth=self.best_params["max_depth"],
+            min_child_weight=self.best_params["min_child_weight"],
+            subsample=self.best_params["subsample"],
+            grow_policy=self.best_params["grow_policy"],
+        )
+
+        self.xgb_model.fit(X, y)
+
+        return self
+
+    def transform(self, X: pd.DataFrame):
+        """Transform the xgboost model."""
+        # copy the data as not to overwrite it
+        X = X.copy()
+
+        self.xgb_model.transform(X)
+
+        return X
 
 
 def is_cinema(format):

@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from pydantic import BaseModel
-from strictyaml import YAML, load, List
+from strictyaml import YAML, load, List, Dict
 
 import regression_model
 
@@ -37,6 +37,9 @@ class ModelConfig(BaseModel):
     tfidf_vars: List[str]
     cast_and_crew_vars: List[str]
     streaming_services: List[str]
+    run_gs: bool
+    gs_params: Dict
+    best_params: Dict
 
 
 class Config(BaseModel):
