@@ -1,5 +1,9 @@
 """Tests for the handling of data within the model."""
+import sys
+from pathlib import Path
 import pytest
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from regression_model.config.core import config
 from regression_model.processing.data_manager import *
