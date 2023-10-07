@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 import pytest
 
+# Add this because it's bad to have an __init__.py in tests folder
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from regression_model.config.core import config
