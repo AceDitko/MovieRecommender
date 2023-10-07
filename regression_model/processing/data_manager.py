@@ -49,10 +49,13 @@ def load_dataset(*, file_name: str) -> pd.DataFrame:
     if Path(f"{DATASET_DIR}/{file_name}").is_file():
         return pd.read_json("f{DATASET_DIR}/{file_name}")
     else:
-        return create_moviedb(file_name)
+        if file_name == config.app_config.test_data_file:
+            return create_moviedb(file_name, True)
+        else:
+            return create_moviedb(file_name)
 
 
-def create_moviedb(*, file_name: str) -> pd.DataFrame:
+def create_moviedb(*, file_name: str, test_file: bool = False) -> pd.DataFrame:
     """Create the movie dataset if it does not exist.
 
     pull_from_sheet() creates a single dataframe containing all user data
@@ -64,12 +67,12 @@ def create_moviedb(*, file_name: str) -> pd.DataFrame:
     When create_moviedb() creates the dataset, it saves it to the config
     specified file name in the DATASET_DIR.
     """
-    moviedb = pull_from_imdb(pull_from_sheet)
+    moviedb = pull_from_imdb(pull_from_sheet(test_file))
     moviedb.to_json("f{DATASET_DIR}/{file_name}")
-    return pull_from_imdb(pull_from_sheet)
+    return moviedb
 
 
-def pull_from_sheet() -> pd.DataFrame:
+def pull_from_sheet(*, test_file: bool = False) -> pd.DataFrame:
     """Pull input data and concatenate into single sheet."""
     # Authenticate with the google sheet
     scope = [
@@ -104,7 +107,13 @@ def pull_from_sheet() -> pd.DataFrame:
         spreadsheet_df_list.append(pd.read_json(json_object))
 
     # Concatenate the list of dfs into a single dataframe
-    return pd.concat(spreadsheet_df_list)
+    final_df = pd.concat(spreadsheet_df_list)
+
+    # If making test file, only return 10 random rows
+    if test_file:
+        final_df.sample(10, random_state=42)
+    else:
+        return final_df
 
 
 def pull_from_imdb(*, in_df: pd.DataFrame) -> pd.DataFrame:
