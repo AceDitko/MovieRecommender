@@ -14,7 +14,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
-from regression_model import __version__ as _version
+# from regression_model import __version__ as _version
 from regression_model.config.core import DATASET_DIR, TRAINED_MODEL_DIR, config
 
 start_year = 2018
