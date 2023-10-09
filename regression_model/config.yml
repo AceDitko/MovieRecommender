@@ -77,14 +77,46 @@ run_gs: false
 
 # grid search parameters (used for grid search if toggle is on)
 gs_params:
- "n_estimators": [50, 100, 150, 200, 300, 500, 750, 1000]
- "max_features": ['auto', 'sqrt', 'log2']
- "grow_policy": ['depthwise', 'lossguide']
- "max_depth": [3, 4, 5]
- "min_child_weight": [1, 2, 5, 10]
- "gamma": [0.5, 1, 1.5, 2, 5]
- "subsample": [0.4, 0.6, 0.8, 1.0]
- "colsample_bytree": [0.6, 0.8, 1.0]
+ "n_estimators":
+  - 50
+  - 100
+  - 150
+  - 200
+  - 300
+  - 500
+  - 750
+  - 1000
+ "max_features":
+  - "auto"
+  - "sqrt"
+  - "log2"
+ "grow_policy":
+  - "depthwise"
+  - "lossguide"
+ "max_depth":
+  - 3
+  - 4
+  - 5
+ "min_child_weight":
+  - 1
+  - 2
+  - 5
+  - 10
+ "gamma":
+  - 0.5
+  - 1
+  - 1.5
+  - 2
+  - 5
+ "subsample":
+  - 0.4
+  - 0.6
+  - 0.8
+  - 1.0
+ "colsample_bytree":
+  - 0.6
+  - 0.8
+  - 1.0
 
 # best parameters for the xgboost model
 best_params:
