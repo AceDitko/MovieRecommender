@@ -30,8 +30,9 @@ def load_dataset(file_name: str) -> pd.DataFrame:
     If movie_db.json does not exist, creates the file using imdb info pulled
     using the omdb api and returns it as a df.
     """
-    if Path(f"{DATASET_DIR}/{file_name}").is_file():
-        return pd.read_json("f{DATASET_DIR}/{file_name}")
+    path = Path("f{DATASET_DIR}/{file_name}")
+    if path.is_file():
+        return pd.read_json(path)
     else:
         if file_name == config.app_config.test_data_file:
             return create_moviedb(file_name, True)
@@ -106,7 +107,7 @@ def pull_from_sheet(test_file: bool = False) -> pd.DataFrame:
 
     # If making test file, only return 10 random rows
     if test_file:
-        return final_df.sample(10, random_state=42)
+        return final_df.sample(10, random_state=42).reset_index(drop=True)
     else:
         return final_df
 
@@ -176,7 +177,7 @@ def update_imdb_df(imdb_df: pd.DataFrame, spreadsheet_df: pd.DataFrame) -> pd.Da
     return imdb_df
 
 
-def name_search_string(self, title):
+def name_search_string(title):
     """Convert a string movie title into an omdb compatible search name key."""
     substrings = str(title).split(" ")
     search_string = ""
@@ -185,7 +186,7 @@ def name_search_string(self, title):
     return search_string
 
 
-def year_search_string(self, date):
+def year_search_string(date):
     """Convert a date into an omdb compatible search date key."""
     dates = date.split("/")
     return str(dates[-1])
