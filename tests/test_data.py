@@ -10,7 +10,9 @@ from regression_model.config.core import config
 from regression_model.processing.data_manager import *
 
 
-@pytest.fixture()
-def simple_input_data():
+# @pytest.fixture()
+def test_input_data():
     """Create/load the test dataset."""
-    return load_dataset(file_name=config.app_config.test_data_file)
+    test_df = load_dataset(file_name=config.app_config.test_data_file)
+    print(len(test_df))
+    assert len(test_df) == 10
