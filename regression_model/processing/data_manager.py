@@ -52,7 +52,7 @@ def create_moviedb(file_name: str, test_file: bool = False) -> pd.DataFrame:
     specified file name in the DATASET_DIR.
     """
     moviedb = pull_from_imdb(pull_from_sheet(test_file))
-    moviedb.to_json("f{DATASET_DIR}/{file_name}")
+    moviedb.to_json(f"{DATASET_DIR}/{file_name}")
     return moviedb
 
 
@@ -138,7 +138,7 @@ def pull_from_imdb(in_df: pd.DataFrame) -> pd.DataFrame:
 
     out_list = []
 
-    pbar = tqdm(search_df["search_key"].to_list())
+    pbar = tqdm.tqdm(search_df["search_key"].to_list())
 
     for key in pbar:
         key_url = omdb_url + key
@@ -155,9 +155,11 @@ def pull_from_imdb(in_df: pd.DataFrame) -> pd.DataFrame:
 def update_imdb_df(imdb_df: pd.DataFrame, spreadsheet_df: pd.DataFrame) -> pd.DataFrame:
     """Add additional fields from spreadsheet to df created from omdb data."""
     imdb_df["Format"] = spreadsheet_df["Format"].values
-    imdb_df["Viewing Date"] = spreadsheet_df["Viewing Data"].values
+    imdb_df["Viewing Date"] = spreadsheet_df["Viewing Date"].values
     imdb_df["Days to View"] = spreadsheet_df["Days to View"].values
-    imdb_df["Days Since Release"] = spreadsheet_df["Release Date"].apply(getdays())
+    imdb_df["Days Since Release"] = spreadsheet_df["Release Date"].apply(
+        lambda x: getdays(x)
+    )
     imdb_df["True Rating"] = spreadsheet_df["True Rating"].apply(lambda x: int(x))
     imdb_df = imdb_df.drop(
         columns=[
