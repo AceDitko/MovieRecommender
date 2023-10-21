@@ -1,6 +1,5 @@
 """Setup file for package."""
 #!/user/bin/env python
-# -*- coding: utf-8 -*-
 
 from pathlib import Path
 
@@ -17,6 +16,7 @@ long_description = DESCRIPTION
 
 # Load the package's VERSION file as a dictionary.
 about = {}
+print(Path(__file__).resolve().parent)
 ROOT_DIR = Path(__file__).resolve().parent
 REQUIREMENTS_DIR = ROOT_DIR / "requirements"
 PACKAGE_DIR = ROOT_DIR / "regression_model"
@@ -28,7 +28,9 @@ with open(PACKAGE_DIR / "VERSION") as f:
 # What packages are required for this model to be executed?
 def list_reqs(fname: str = "requirements.txt"):
     """List contents of requirements file."""
-    with open(REQUIREMENTS_DIR / fname) as fd:
+    with open(REQUIREMENTS_DIR / fname, encoding="utf-16") as fd:
+        for i in fd.read().splitlines():
+            i
         return fd.read().splitlines()
 
 
