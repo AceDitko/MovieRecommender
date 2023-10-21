@@ -12,13 +12,17 @@ import typing as t
 from oauth2client.service_account import ServiceAccountCredentials
 from googleapiclient.discovery import build
 
-pd.options.mode.chained_assignment = None  # default='warn'
-
-# from regression_model import __version__ as _version
+from regression_model import __version__ as _version
 from regression_model.config.core import DATASET_DIR, TRAINED_MODEL_DIR, config
 
+pd.options.mode.chained_assignment = None  # default='warn'
+
+
 start_year = 2018
-url = "https://docs.google.com/spreadsheets/d/1w-LyhsGUqNFiFqsF2QVgfA5MARTMRWFxMbG-FiWQf9c/edit#gid=621622277"
+url = (
+    "https://docs.google.com/spreadsheets/d/1w-"
+    "LyhsGUqNFiFqsF2QVgfA5MARTMRWFxMbG-FiWQf9c/edit#gid=621622277"
+)
 SPREADSHEET_ID = "1w-LyhsGUqNFiFqsF2QVgfA5MARTMRWFxMbG-FiWQf9c"
 
 
@@ -74,8 +78,8 @@ def pull_from_sheet(test_file: bool = False) -> pd.DataFrame:
     try:
         service = build("sheets", "v4", credentials=creds)
         in_sheets = service.spreadsheets()
-    except:
-        raise AttributeError("Could not authenticate with google sheet")
+    except FileNotFoundError:
+        raise FileNotFoundError("Service account key not found")
 
     # Obtain the current year and number of sheets that should exist
     today = datetime.date.today()
@@ -133,7 +137,10 @@ def pull_from_imdb(in_df: pd.DataFrame) -> pd.DataFrame:
     # search_df['counts'] = search_df['search_title'].map(search_df['search_title'].value_counts())
     # search_df['counts'].apply(lambda x: int(x))
 
-    # search_df['search_key'] = np.where(search_df['counts'] == 1, api_key + search_df['search_title'], api_key+search_df['search_title'] + "&y=" + search_df['search_year'])
+    # search_df['search_key'] = np.where(search_df['counts'] == 1,
+    #                           api_key + search_df['search_title'],
+    #                           api_key+search_df['search_title'] + "&y="
+    #                                                             + search_df['search_year'])
 
     search_df["search_key"] = api_key + search_df["IMDB ID"]
 
@@ -141,6 +148,7 @@ def pull_from_imdb(in_df: pd.DataFrame) -> pd.DataFrame:
 
     pbar = tqdm.tqdm(search_df["search_key"].to_list())
 
+    # test commit for flake8
     for key in pbar:
         key_url = omdb_url + key
         r = requests.get(key_url)
