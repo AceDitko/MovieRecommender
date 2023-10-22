@@ -12,7 +12,7 @@ import typing as t
 from oauth2client.service_account import ServiceAccountCredentials
 from googleapiclient.discovery import build
 
-from regression_model import __version__ as _version
+# from regression_model import __version__ as _version
 from regression_model.config.core import DATASET_DIR, TRAINED_MODEL_DIR, config
 
 pd.options.mode.chained_assignment = None  # default='warn'
@@ -225,7 +225,9 @@ def save_pipeline(pipeline_to_persist: Pipeline) -> None:
     that can be called.
     """
     # Prepare versioned save file name
-    save_file_name = f"{config.app_config.pipeline_save_file}{_version}.pk1"
+    save_file_name = (
+        f"{config.app_config.pipeline_save_file}{config.appconfig.version}.pk1"
+    )
     save_path = TRAINED_MODEL_DIR / save_file_name
 
     remove_old_pipelines(file_to_keep=[save_file_name])

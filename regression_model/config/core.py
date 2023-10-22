@@ -13,6 +13,10 @@ ROOT = PACKAGE_ROOT.parent
 CONFIG_FILE_PATH = PACKAGE_ROOT / "config.yml"
 DATASET_DIR = PACKAGE_ROOT / "datasets"
 TRAINED_MODEL_DIR = PACKAGE_ROOT / "trained_models"
+VERSION = ""
+with open(PACKAGE_ROOT / "VERSION") as f:
+    _version = f.read().strip()
+    VERSION = _version
 
 
 class AppConfig(BaseModel):
@@ -22,6 +26,7 @@ class AppConfig(BaseModel):
     training_data_file: str
     test_data_file: str
     pipeline_save_file: str
+    version: str
 
 
 class ModelConfig(BaseModel):
