@@ -26,6 +26,16 @@ url = (
 SPREADSHEET_ID = "1w-LyhsGUqNFiFqsF2QVgfA5MARTMRWFxMbG-FiWQf9c"
 
 
+def get_version() -> str:
+    """Read the application version from VERSION file.
+
+    This only exists because setuptools are being a nightmare. Will be removed
+    after migration to poetry.
+    """
+    with open("../VERSION") as f:
+        return f.read().strip()
+
+
 def load_dataset(file_name: str) -> pd.DataFrame:
     """
     Load movie dataset into input_df.
@@ -225,9 +235,7 @@ def save_pipeline(pipeline_to_persist: Pipeline) -> None:
     that can be called.
     """
     # Prepare versioned save file name
-    save_file_name = (
-        f"{config.app_config.pipeline_save_file}{config.appconfig.version}.pk1"
-    )
+    save_file_name = f"{config.app_config.pipeline_save_file}{get_version()}.pk1"
     save_path = TRAINED_MODEL_DIR / save_file_name
 
     remove_old_pipelines(file_to_keep=[save_file_name])
