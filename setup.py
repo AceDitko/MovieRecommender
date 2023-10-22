@@ -29,8 +29,8 @@ with open(PACKAGE_DIR / "VERSION") as f:
 # What packages are required for this model to be executed?
 def list_reqs(fname: str = "requirements.txt"):
     """List contents of requirements file."""
-    with open(REQUIREMENTS_DIR / fname, encoding="utf-16") as fd:
-        for i in fd.read().splitlines():
+    with open(REQUIREMENTS_DIR / fname, encoding="utf-8") as fd:
+        for i in fd.read():
             i
         return fd.read().splitlines()
 
