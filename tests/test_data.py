@@ -10,9 +10,25 @@ from regression_model.config.core import config
 from regression_model.processing.data_manager import *
 
 
-# @pytest.fixture()
-def test_input_data():
+@pytest.fixture()
+def example_data():
     """Create/load the test dataset."""
-    test_df = load_dataset(file_name=config.app_config.test_data_file)
-    print(len(test_df))
-    assert len(test_df) == 10
+    ex_data = load_dataset(file_name=config.app_config.test_data_file)
+    return ex_data
+
+
+def test_data_length(example_data: pd.DataFrame):
+    """Check that the test dataset contains exactly ten rows."""
+    assert len(example_data) == 10
+
+
+def test_data_features(example_data: pd.DataFrame):
+    """Check that the test dataset's columns match the config."""
+    all_cols_present = True
+
+    for field in config.app_config.imported_fields:
+        if field not in example_data.columns:
+            all_cols_present = False
+            break
+
+    assert all_cols_present == True
