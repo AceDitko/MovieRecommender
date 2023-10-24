@@ -27,6 +27,25 @@ features:
  - Is_weekday
  - Plot
 
+# Fields required to be imported from omdb api/google sheet
+imported_fields:
+ - Title
+ - Rated
+ - Runtime
+ - Genre
+ - Director
+ - Writer
+ - Actors
+ - Plot
+ - Metascore
+ - imdbRating
+ - BoxOffice
+ - Format
+ - Viewing Data
+ - Days to View
+ - Days Since Release
+ - True Rating
+
 # set train/test split
 test_size: 0.1
 

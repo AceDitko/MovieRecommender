@@ -33,6 +33,7 @@ class ModelConfig(BaseModel):
 
     target: str
     features: List[str]
+    imported_fields: List[str]
     test_size: float
     random_state: int
     alpha: float
@@ -78,9 +79,11 @@ def create_and_validate_config(parsed_config: YAML = None) -> Config:
         parsed_config = fetch_config_from_yaml()
 
     # specify the data attribute from the strictyaml YAML type
-    _config = Config(app_config=AppConfig(**parsed_config.data))
+    app_config = AppConfig(**parsed_config.data)
+    model_config = ModelConfig(**parsed_config.data)
 
-    return _config
+    config = Config(app_config=app_config, model_config=model_config)
+    return config
 
 
 config = create_and_validate_config()
