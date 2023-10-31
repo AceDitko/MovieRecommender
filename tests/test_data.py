@@ -17,6 +17,16 @@ def example_data():
     return ex_data
 
 
+def test_get_version():
+    """Check that the version file exists and holds valid data."""
+    assert Path("regression_model/VERSION").is_file() == True
+
+    with open("regression_model/VERSION") as f:
+        version = f.read().strip()
+
+    assert len(version.split(".")) == 3
+
+
 def test_data_length(example_data: pd.DataFrame):
     """Check that the test dataset contains exactly ten rows."""
     assert len(example_data) == 10
