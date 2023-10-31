@@ -26,6 +26,9 @@ def test_get_version():
 
     assert len(version.split(".")) == 3
 
+    for value in version.split("."):
+        assert value.isnumeric() == True
+
 
 def test_data_length(example_data: pd.DataFrame):
     """Check that the test dataset contains exactly ten rows."""
