@@ -10,7 +10,7 @@ from sklearn.pipeline import Pipeline
 import joblib
 import typing as t
 from oauth2client.service_account import ServiceAccountCredentials
-from googleapiclient.discovery import build
+from googleapiclient import discovery
 
 # from regression_model import __version__ as _version
 from regression_model.config.core import DATASET_DIR, TRAINED_MODEL_DIR, config
@@ -86,7 +86,7 @@ def pull_from_sheet(test_file: bool = False) -> pd.DataFrame:
     )
 
     try:
-        service = build("sheets", "v4", credentials=creds)
+        service = discovery.build("sheets", "v4", credentials=creds)
         in_sheets = service.spreadsheets()
     except FileNotFoundError:
         raise FileNotFoundError("Service account key not found")
@@ -115,6 +115,9 @@ def pull_from_sheet(test_file: bool = False) -> pd.DataFrame:
         spreadsheet_df_list.append(
             pd.DataFrame(result["values"][1:], columns=result["values"][0])
         )
+
+    # Close the connection to the google sheet
+    service.close()
 
     # Concatenate the list of dfs into a single dataframe
     final_df = pd.concat(spreadsheet_df_list).dropna()
