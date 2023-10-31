@@ -26,11 +26,6 @@ class AppConfig(BaseModel):
     training_data_file: str
     test_data_file: str
     pipeline_save_file: str
-
-
-class ModelConfig(BaseModel):
-    """All config relevant to model training and feature engineering."""
-
     target: str
     features: List[str]
     imported_fields: List[str]
@@ -51,7 +46,6 @@ class Config(BaseModel):
     """Master config object."""
 
     app_config: AppConfig
-    model_config: ModelConfig
 
 
 def find_config_file() -> Path:
@@ -79,10 +73,8 @@ def create_and_validate_config(parsed_config: YAML = None) -> Config:
         parsed_config = fetch_config_from_yaml()
 
     # specify the data attribute from the strictyaml YAML type
-    app_config = AppConfig(**parsed_config.data)
-    model_config = ModelConfig(**parsed_config.data)
-
-    config = Config(app_config=app_config, model_config=model_config)
+    a_config = AppConfig(**parsed_config.data)
+    config = Config(app_config=a_config)
     return config
 
 
