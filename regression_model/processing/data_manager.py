@@ -144,16 +144,6 @@ def pull_from_imdb(in_df: pd.DataFrame) -> pd.DataFrame:
     omdb_url = "http://omdbapi.com/"
 
     search_df = in_df[["Name", "Release Date", "IMDB ID"]]
-    # search_df['search_title'] = search_df['Name'].apply(self.name_search_string)
-    # search_df['search_year'] = search_df['Release Date'].apply(self.year_search_string)
-
-    # search_df['counts'] = search_df['search_title'].map(search_df['search_title'].value_counts())
-    # search_df['counts'].apply(lambda x: int(x))
-
-    # search_df['search_key'] = np.where(search_df['counts'] == 1,
-    #                           api_key + search_df['search_title'],
-    #                           api_key+search_df['search_title'] + "&y="
-    #                                                             + search_df['search_year'])
 
     search_df["search_key"] = api_key + search_df["IMDB ID"]
 
@@ -161,7 +151,6 @@ def pull_from_imdb(in_df: pd.DataFrame) -> pd.DataFrame:
 
     pbar = tqdm.tqdm(search_df["search_key"].to_list())
 
-    # test commit for flake8
     for key in pbar:
         key_url = omdb_url + key
         r = requests.get(key_url)
@@ -196,21 +185,6 @@ def update_imdb_df(imdb_df: pd.DataFrame, spreadsheet_df: pd.DataFrame) -> pd.Da
         ]
     ).reset_index(drop=True)
     return imdb_df
-
-
-def name_search_string(title):
-    """Convert a string movie title into an omdb compatible search name key."""
-    substrings = str(title).split(" ")
-    search_string = ""
-    for substring in substrings:
-        search_string += substring + "+"
-    return search_string
-
-
-def year_search_string(date):
-    """Convert a date into an omdb compatible search date key."""
-    dates = date.split("/")
-    return str(dates[-1])
 
 
 def getdays(date: str) -> int:
