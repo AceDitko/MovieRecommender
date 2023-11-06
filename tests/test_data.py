@@ -50,3 +50,37 @@ def test_data_features(example_data: pd.DataFrame):
             break
 
     assert all_cols_present == True
+
+
+def test_get_days():
+    "Test the robustness of the get_days function."
+    today = datetime.date.today()
+    yesterday = today - datetime.timedelta(days=1)
+
+    y_date = yesterday.strftime("%d/%m/%Y")
+    assert get_days(y_date) == 1
+
+    with pytest.raises(ValueError) as err:
+        date = "01012001"
+        _ = get_days(date)
+    assert "Date not '/' delimited. Format should be dd/mm/yyyy" in str(err.value)
+
+    with pytest.raises(ValueError) as err:
+        date = "01/01/2001/01"
+        _ = get_days(date)
+    assert "Date format incorrect. Should be dd/mm/yyyy" in str(err.value)
+
+    with pytest.raises(ValueError) as err:
+        date = "32/12/2001"
+        _ = get_days(date)
+    assert "Day value of date must be between 1 and 31 inclusive" in str(err.value)
+
+    with pytest.raises(ValueError) as err:
+        date = "31/13/2001"
+        _ = get_days(date)
+    assert "Month value of date must be between 1 and 12 inclusive" in str(err.value)
+
+    with pytest.raises(ValueError) as err:
+        date = "31/12/1887"
+        _ = get_days(date)
+    assert "Year value of date earlier than first ever film in 1888" in str(err.value)
