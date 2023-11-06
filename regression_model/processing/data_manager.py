@@ -247,16 +247,28 @@ def get_days(date: str) -> int:
     Returns:
     int: Number of whole days passed since input date
     """
-    test_date = date
-    temp_test_dates = test_date.split("/")
-    test_dates = [int(i) for i in temp_test_dates]
+    if "/" not in date:
+        raise ValueError("Date not '/' delimited. Format should be dd/mm/yyyy")
+
+    str_past_dates = date.split("/")
+    if len(str_past_dates) > 3:
+        raise ValueError("Date format incorrect. Should be dd/mm/yyyy")
+
+    past_dates = [int(i) for i in str_past_dates]
+
+    if past_dates[0] < 1 or past_dates[0] > 31:
+        raise ValueError("Day value of date must be between 1 and 31 inclusive")
+    if past_dates[1] < 1 or past_dates[1] > 12:
+        raise ValueError("Month value of date must be between 1 and 12 inclusive")
+    if past_dates[2] < 1888:
+        raise ValueError("Year value of date earlier than first ever film in 1888")
 
     today = datetime.date.today()
     today_date = today.strftime("%d/%m/%Y")
-    temp_today_dates = today_date.split("/")
-    today_dates = [int(i) for i in temp_today_dates]
+    str_today_dates = today_date.split("/")
+    today_dates = [int(i) for i in str_today_dates]
 
-    d0 = datetime.date(test_dates[2], test_dates[1], test_dates[0])
+    d0 = datetime.date(past_dates[2], past_dates[1], past_dates[0])
     d1 = datetime.date(today_dates[2], today_dates[1], today_dates[0])
     delta = d1 - d0
     return delta.days
