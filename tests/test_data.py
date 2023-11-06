@@ -18,7 +18,12 @@ def example_data():
 
 
 def test_get_version():
-    """Check that the version file exists and holds valid data."""
+    """Check that the version file exists and holds valid data.
+
+    VERSION file should contain a single string in the format X.Y.Z where each
+    letter corresponds to an integer number. This test checks that there are
+    only three numbers in the string, and that they are correctly delimited.
+    """
     assert Path("regression_model/VERSION").is_file() == True
 
     with open("regression_model/VERSION") as f:
