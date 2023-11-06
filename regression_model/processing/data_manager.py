@@ -31,6 +31,9 @@ def get_version() -> str:
 
     This only exists because setuptools are being a nightmare. Will be removed
     after migration to poetry.
+
+    Returns:
+    version(str): The version number of the package
     """
     with open("../VERSION") as f:
         return f.read().strip()
@@ -43,6 +46,18 @@ def load_dataset(file_name: str) -> pd.DataFrame:
     If movie_db.json exists, reads the file and returns it as a df.
     If movie_db.json does not exist, creates the file using imdb info pulled
     using the omdb api and returns it as a df.
+
+    Parameters:
+    file_name(str): File name of data to load
+
+    Returns:
+    movie_db(pd.DataFrame): If data is already saved as a .json file, this is
+                            read and returned as a df. If the file does not
+                            exist, the data will be created via create_moviedb
+                            and subsequent functions.
+                            If file_name matches the name of the test_data_file
+                            in the config, only ten rows of data will be
+                            returned in order to create the pytest data file.
     """
     path = Path("f{DATASET_DIR}/{file_name}")
     if path.is_file():
@@ -65,6 +80,14 @@ def create_moviedb(file_name: str, test_file: bool = False) -> pd.DataFrame:
     sheet.
     When create_moviedb() creates the dataset, it saves it to the config
     specified file name in the DATASET_DIR.
+
+    Parameters:
+    file_name(str): Name for final saved dataset
+    test_file(bool): If true only 10 rows are returned to create pytest data
+
+    Returns:
+    moviedb(pd.DataFrame): Final output df containing combination of data from
+                            omdb and google sheet
     """
     moviedb = pull_from_imdb(pull_from_sheet(test_file))
     moviedb.to_json(f"{DATASET_DIR}/{file_name}")
@@ -72,7 +95,14 @@ def create_moviedb(file_name: str, test_file: bool = False) -> pd.DataFrame:
 
 
 def pull_from_sheet(test_file: bool = False) -> pd.DataFrame:
-    """Pull input data and concatenate into single sheet."""
+    """Pull input data and concatenate into single sheet.
+
+    Parameters:
+    test_file(bool): If true only 10 rows are returned to create pytest data
+
+    Returns:
+    final_df(pd.DataFrame): Dataframe containing raw data from google sheet
+    """
     # Authenticate with google sheet
     scope = [
         "https://spreadsheets.google.com/feeds",
@@ -137,6 +167,13 @@ def pull_from_imdb(in_df: pd.DataFrame) -> pd.DataFrame:
     from imdb, which is stored in a single output dataframe. Once this dataframe
     is created, relevant information from the google sheet data is added by
     calling update_imdb_df() and then this final combined dataframe is returned.
+
+    Parameters:
+    in_df(pd.DataFrame): df scraped from google sheet containing API search key
+
+    Returns:
+    updated_df(pd.DataFrame): Updated version of out_df created by this function
+                                including modifications from update_imdb_df()
     """
     in_df = in_df[in_df.Name != ""]
 
@@ -164,7 +201,22 @@ def pull_from_imdb(in_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def update_imdb_df(imdb_df: pd.DataFrame, spreadsheet_df: pd.DataFrame) -> pd.DataFrame:
-    """Add additional fields from spreadsheet to df created from omdb data."""
+    """Add additional fields from spreadsheet to df created from omdb data.
+
+    Parameters:
+    imdb_df(pd.DataFrame): df containing unprocessed data from omdb api
+    spreadsheet_df(pd.DataFrame): df containing data from google sheet
+
+    Returns:
+    imdb_df(pd.DataFrame): Modified input imdb_df with the following changes:
+                            - Format, Viewing Date, Days to View copied from
+                            spreadsheet_df
+                            - Days Since Release added from applying getdays()
+                            to spreadsheet_df's release date column
+                            - True rating created from spreadsheet_df
+                            - imdbVotes, Response, Type, Website, Language, DVD,
+                            and Country fields dropped
+    """
     imdb_df["Format"] = spreadsheet_df["Format"].values
     imdb_df["Viewing Date"] = spreadsheet_df["Viewing Date"].values
     imdb_df["Days to View"] = spreadsheet_df["Days to View"].values
@@ -174,7 +226,6 @@ def update_imdb_df(imdb_df: pd.DataFrame, spreadsheet_df: pd.DataFrame) -> pd.Da
     imdb_df["True Rating"] = spreadsheet_df["True Rating"].apply(lambda x: int(x))
     imdb_df = imdb_df.drop(
         columns=[
-            "imdbID",
             "imdbVotes",
             "Response",
             "Type",
@@ -227,7 +278,14 @@ def save_pipeline(pipeline_to_persist: Pipeline) -> None:
 
 
 def load_pipeline(file_name: str) -> Pipeline:
-    """Load the persisted pipeline."""
+    """Load the persisted pipeline.
+
+    Parameters:
+    file_name(str): The name of the saved pipeline file
+
+    Returns:
+    trained_model(Pipeline): Returns the pipeline loaded from file_name
+    """
     file_path = TRAINED_MODEL_DIR / file_name
     trained_model = joblib.load(filenmae=file_path)
     return trained_model
@@ -238,6 +296,9 @@ def remove_old_pipelines(files_to_keep: t.List[str]) -> None:
 
     This is to ensure there is a simple one-to-one mapping between the package
     version and the model version to be imported and used by other applications.
+
+    Parameters:
+    files_to_keep(t.List[str]): List of string filenames to persist
     """
     do_not_delete = files_to_keep + ["__init__.py"]
     for model_file in TRAINED_MODEL_DIR.iterdir():
