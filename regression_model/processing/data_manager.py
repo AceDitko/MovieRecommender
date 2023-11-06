@@ -211,7 +211,7 @@ def update_imdb_df(imdb_df: pd.DataFrame, spreadsheet_df: pd.DataFrame) -> pd.Da
     imdb_df(pd.DataFrame): Modified input imdb_df with the following changes:
                             - Format, Viewing Date, Days to View copied from
                             spreadsheet_df
-                            - Days Since Release added from applying getdays()
+                            - Days Since Release added from applying get_days()
                             to spreadsheet_df's release date column
                             - True rating created from spreadsheet_df
                             - imdbVotes, Response, Type, Website, Language, DVD,
@@ -221,7 +221,7 @@ def update_imdb_df(imdb_df: pd.DataFrame, spreadsheet_df: pd.DataFrame) -> pd.Da
     imdb_df["Viewing Date"] = spreadsheet_df["Viewing Date"].values
     imdb_df["Days to View"] = spreadsheet_df["Days to View"].values
     imdb_df["Days Since Release"] = spreadsheet_df["Release Date"].apply(
-        lambda x: getdays(x)
+        lambda x: get_days(x)
     )
     imdb_df["True Rating"] = spreadsheet_df["True Rating"].apply(lambda x: int(x))
     imdb_df = imdb_df.drop(
@@ -238,7 +238,7 @@ def update_imdb_df(imdb_df: pd.DataFrame, spreadsheet_df: pd.DataFrame) -> pd.Da
     return imdb_df
 
 
-def getdays(date: str) -> int:
+def get_days(date: str) -> int:
     """Calculate difference in days between today and given date.
 
     Parameters:
