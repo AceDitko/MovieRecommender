@@ -188,7 +188,14 @@ def update_imdb_df(imdb_df: pd.DataFrame, spreadsheet_df: pd.DataFrame) -> pd.Da
 
 
 def getdays(date: str) -> int:
-    """Calculate difference in days between today and given date."""
+    """Calculate difference in days between today and given date.
+
+    Parameters:
+    date(int): A date string of format dd/mm/yyyy
+
+    Returns:
+    int: Number of whole days passed since input date
+    """
     test_date = date
     temp_test_dates = test_date.split("/")
     test_dates = [int(i) for i in temp_test_dates]
