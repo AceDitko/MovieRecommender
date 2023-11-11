@@ -16,3 +16,24 @@ categorical_transformer = Pipeline(
         ("onehot", OneHotEncoder(handle_unknown="ignore")),
     ]
 )
+
+feature_creator = Pipeline(
+    steps=[
+        ("IsCinemaCreator", pp.IsCinemaCreator()),
+        ("IsWeekdayCreator", pp.IsWeekdayCreator()),
+        (
+            "BowCastCreator",
+            pp.BowCastCreator(variables=config.app_config.cast_and_crew_vars),
+        ),
+        ("TfidfCreator", pp.TfidfCreator(config.app_config.tfidf_vars)),
+    ]
+)
+
+rate_pipe = Pipeline(
+    steps=[
+        numerical_transformer,
+        categorical_transformer,
+        feature_creator,
+        ("XGBoostHandler", pp.XgboostHandler),
+    ]
+)
